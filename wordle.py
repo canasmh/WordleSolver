@@ -62,24 +62,39 @@ class WordleSolver(WordleDriver):
         ]
         self.five_letter_words = five_letter_words
         self.correct_word = "_____"
-        self.letters_not_present = []
+        self.letters_absent = []
         self.letters_present = {}
         self.guesses = []
         self.irow = 0
 
     def solver(self):
-        # New guess
-        # Input guess
-        # Check if guess successfully inputted
-        # Remove invalid words
-        pass
+
+        while self.irow < len(self.game_rows):
+            # God Speed :)
+            guess = self.new_guess()
+            self.input_guess(guess)
+            time.sleep(2)
 
     def new_guess(self):
         if len(self.guesses) == 0:
             return random.choice(self.common_five_letter_words)
 
         else:
-            return None
+            # Check how the previous guess did
+            tiles = self.get_tiles(self.irow - 1)
+
+            for index, tile in enumerate(tiles):
+                tile_div = tile.find_element(By.TAG_NAME, "div")
+                evaluation = tile_div.get_attribute("evaluation")
+                letter = tile_div.text.upper()
+
+                if evaluation == "absent":
+                    self.letters_absent.append(letter)
+
+                elif evaluation == "present":
+                    self.letters_present[letter] = index
+                elif evaluation == "correct":
+                    self.correct_word[index] = letter
 
     def input_guess(self, guess):
         keyboard = self.get_keyboard()
@@ -92,13 +107,20 @@ class WordleSolver(WordleDriver):
         for key in keyboard:
             if key.text == "ENTER":
                 key.click()
+                break
 
         if self.word_is_valid():
             self.irow += 1
             self.guesses.append(guess)
+
         else:
             self.five_letter_words.remove(guess)
-            # TODO: HANDLE CASE WHERE GUESS IS NOT A WORD
+            for key in keyboard:
+                # Find the backspace
+                if key.text == "":
+                    for i in list(range(5)):
+                        key.click()
+                    break
 
     def word_is_valid(self):
         tiles = self.get_tiles(self.game_rows[self.irow])
