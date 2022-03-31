@@ -7,6 +7,9 @@ from webdriver_manager.chrome import ChromeDriverManager
 import time
 
 
+# TODO: KEEP TRACK OF SCORE
+
+
 class WordleDriver:
 
     def __init__(self):
@@ -53,28 +56,30 @@ class WordleSolver(WordleDriver):
         self.common_five_letter_words = [
             'FRAME',
             'GRAZE',
-            'WINDY',
             'PAINT',
             'GOURD',
             'SWING',
             'AUDIO',
-            'ARISE'
+            'ARISE',
+            'WINDY'
         ]
         self.five_letter_words = five_letter_words
         self.correct_word = ["_", "_", "_", "_", "_"]
         self.letters_absent = []
         self.letters_present = {}
         self.guesses = []
-        self.irow = 0
+        self.i_row = 0
 
     def solve(self):
 
-        while self.irow < len(self.game_rows):
-            # God Speed :)
+        while self.i_row < len(self.game_rows):
+            print(f"Guess # {self.i_row + 1}")
             print(f"Length of five letter words: {len(self.five_letter_words)}")
+            print(f"Correct word: {''.join(self.correct_word)}")
             guess = self.new_guess()
+            print(f"Guess word: {guess}")
             self.input_guess(guess)
-            time.sleep(2)
+            print("")
 
             if "_" not in self.correct_word:
                 print(f"You won!\nCorrect word: {''.join(self.correct_word)}")
@@ -101,35 +106,40 @@ class WordleSolver(WordleDriver):
         for key in keyboard:
             if key.text == "ENTER":
                 key.click()
+                time.sleep(2.5)
                 break
 
         if self.word_is_valid():
-            self.irow += 1
+            self.i_row = self.i_row + 1
             self.guesses.append(guess)
             self.evaluate_guess()
+            self.remove_invalid_words()
 
         else:
             self.five_letter_words.remove(guess)
+            print("Invalid Guess Word")
             for key in keyboard:
                 # Find the backspace
                 if key.text == "":
-                    for i in list(range(5)):
+                    for _ in list(range(5)):
                         key.click()
                     break
 
     def word_is_valid(self):
-        tiles = self.get_tiles(self.game_rows[self.irow])
+        valid = True
+        tiles = self.get_tiles(self.game_rows[self.i_row])
 
         for tile in tiles:
             tile_div = tile.find_element(By.TAG_NAME, "div")
 
             if tile_div.get_attribute("data-state") == "tbd":
-                return False
+                valid = False
             else:
-                return True
+                continue
+        return valid
 
     def evaluate_guess(self):
-        tiles = self.get_tiles(self.game_rows[self.irow - 1])
+        tiles = self.get_tiles(self.game_rows[self.i_row - 1])
 
         # Get the evaluations from the tiles
         for index, tile in enumerate(tiles):
@@ -146,26 +156,87 @@ class WordleSolver(WordleDriver):
             elif evaluation == "correct":
                 self.correct_word[index] = letter
 
+    def find_invalid_words(self):
+        words_to_remove = []
+
+        for word in self.five_letter_words:
+            # Check if matches the correct word
+            for i in list(range(5)):
+                if self.correct_word[i] == "_":
+                    continue
+                elif self.correct_word[i] == word[i]:
+                    continue
+                else:
+                    words_to_remove.append(word)
+
+            if word in words_to_remove:
+                continue
+
+            # Check if letter is truly absent and in word:
+            for letter in self.letters_absent:
+
+                if letter in word:
+                    if letter in self.correct_word:
+                        if self.correct_word.index(letter) == word.index(letter):
+                            print(word)
+                            continue
+                        else:
+                            words_to_remove.append(word)
+                    else:
+                        words_to_remove.append(word)
+                else:
+                    continue
+
+            if word in words_to_remove:
+                continue
+
+            # Check if letter present is in word
+            for letter in self.letters_present.keys():
+                if letter in word:
+                    if self.letters_present[letter] == word.index(letter):
+                        words_to_remove.append(word)
+                else:
+                    words_to_remove.append(word)
+
+            if word in words_to_remove:
+                continue
+
+        # Remove words you've already guessed
+        for guess in self.guesses:
+            words_to_remove += guess
+
+        return words_to_remove
+
+    def remove_invalid_words(self):
+
+        words_to_remove = self.find_invalid_words()
+
+        for word in words_to_remove:
+            try:
+                self.five_letter_words.remove(word)
+            except ValueError:
+                continue
+        print(f"valid Words: {', '.join(self.five_letter_words)}")
+
 
 if __name__ == "__main__":
     from english_words import english_words_lower_set
 
-    five_letter_words = []
+    five_letter_word = []
     correct_word = {}
     incorrect_placement = {}
 
     special_char = "*-'[{]}\|!^&()%$#,.?/><"
     # Only use 5 letter words
-    for word in english_words_lower_set:
-        if len(word) == 5:
+    for words in english_words_lower_set:
+        if len(words) == 5:
             for char in special_char:
-                if char in word:
+                if char in words:
                     break
                 elif char == special_char[-1]:
-                    five_letter_words.append(word.upper())
+                    five_letter_word.append(words.upper())
         else:
             continue
 
-    wordle = WordleSolver(five_letter_words)
+    wordle = WordleSolver(five_letter_word)
     wordle.solve()
-
