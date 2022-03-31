@@ -65,6 +65,23 @@ class WordleSolver(WordleDriver):
         self.letters_not_present = []
         self.letters_present = {}
         self.guesses = []
+        self.irow = 0
+
+    def input_guess(self, guess):
+        keyboard = self.get_keyboard()
+
+        for letter in guess:
+            for key in keyboard:
+                if key.text == letter:
+                    key.click()
+
+        for key in keyboard:
+            if key.text == "ENTER":
+                key.click()
+
+        # TODO: CHECK TO SEE IF THE WORD SUBMITTED ACTUALLY WORKS
+
+    # TODO: CREATE METHOD FOR NEW GUESS
 
 
 if __name__ == "__main__":
