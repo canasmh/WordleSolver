@@ -48,7 +48,7 @@ class WordleDriver:
 
 class WordleSolver(WordleDriver):
 
-    def __init__(self, five_letter_words):
+    def __init__(self, five_letter_words: list):
         super().__init__()
         self.common_five_letter_words = [
             'FRAME',
@@ -79,7 +79,22 @@ class WordleSolver(WordleDriver):
             if key.text == "ENTER":
                 key.click()
 
-        # TODO: CHECK TO SEE IF THE WORD SUBMITTED ACTUALLY WORKS
+        if self.word_is_valid():
+            self.irow += 1
+        else:
+            self.five_letter_words.remove(guess)
+            # TODO: HANDLE CASE WHERE GUESS IS NOT A WORD
+
+    def word_is_valid(self):
+        tiles = self.get_tiles(self.game_rows[self.irow])
+
+        for tile in tiles:
+            tile_div = tile.find_element(By.TAG_NAME, "div")
+
+            if tile_div.get_attribute("data-state") == "tbd":
+                return False
+            else:
+                return True
 
     # TODO: CREATE METHOD FOR NEW GUESS
 
