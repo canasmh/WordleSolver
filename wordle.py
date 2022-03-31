@@ -182,6 +182,8 @@ class WordleSolver(WordleDriver):
                             continue
                         else:
                             words_to_remove.append(word)
+                    elif letter in self.letters_present.keys():
+                        continue
                     else:
                         words_to_remove.append(word)
                 else:
@@ -237,6 +239,7 @@ if __name__ == "__main__":
                     five_letter_word.append(words.upper())
         else:
             continue
+    five_letter_word.append("LOWLY")
 
     wordle = WordleSolver(five_letter_word)
     wordle.solve()
