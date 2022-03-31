@@ -61,40 +61,34 @@ class WordleSolver(WordleDriver):
             'ARISE'
         ]
         self.five_letter_words = five_letter_words
-        self.correct_word = "_____"
+        self.correct_word = ["_", "_", "_", "_", "_"]
         self.letters_absent = []
         self.letters_present = {}
         self.guesses = []
         self.irow = 0
 
-    def solver(self):
+    def solve(self):
 
         while self.irow < len(self.game_rows):
             # God Speed :)
+            print(f"Length of five letter words: {len(self.five_letter_words)}")
             guess = self.new_guess()
             self.input_guess(guess)
             time.sleep(2)
 
+            if "_" not in self.correct_word:
+                print(f"You won!\nCorrect word: {''.join(self.correct_word)}")
+                self.driver.quit()
+                break
+
     def new_guess(self):
         if len(self.guesses) == 0:
-            return random.choice(self.common_five_letter_words)
+            guess = random.choice(self.common_five_letter_words)
 
         else:
-            # Check how the previous guess did
-            tiles = self.get_tiles(self.irow - 1)
+            guess = random.choice(self.five_letter_words)
 
-            for index, tile in enumerate(tiles):
-                tile_div = tile.find_element(By.TAG_NAME, "div")
-                evaluation = tile_div.get_attribute("evaluation")
-                letter = tile_div.text.upper()
-
-                if evaluation == "absent":
-                    self.letters_absent.append(letter)
-
-                elif evaluation == "present":
-                    self.letters_present[letter] = index
-                elif evaluation == "correct":
-                    self.correct_word[index] = letter
+        return guess
 
     def input_guess(self, guess):
         keyboard = self.get_keyboard()
@@ -112,6 +106,7 @@ class WordleSolver(WordleDriver):
         if self.word_is_valid():
             self.irow += 1
             self.guesses.append(guess)
+            self.evaluate_guess()
 
         else:
             self.five_letter_words.remove(guess)
@@ -133,10 +128,44 @@ class WordleSolver(WordleDriver):
             else:
                 return True
 
-    # TODO: CREATE METHOD FOR NEW GUESS
+    def evaluate_guess(self):
+        tiles = self.get_tiles(self.game_rows[self.irow - 1])
+
+        # Get the evaluations from the tiles
+        for index, tile in enumerate(tiles):
+            tile_div = tile.find_element(By.TAG_NAME, "div")
+            evaluation = tile_div.get_attribute("data-state")
+            letter = tile_div.text.upper()
+
+            if evaluation == "absent":
+                self.letters_absent.append(letter)
+
+            elif evaluation == "present":
+                self.letters_present[letter] = index
+
+            elif evaluation == "correct":
+                self.correct_word[index] = letter
 
 
 if __name__ == "__main__":
-    wordle = WordleDriver()
-    wordle.driver.quit()
+    from english_words import english_words_lower_set
+
+    five_letter_words = []
+    correct_word = {}
+    incorrect_placement = {}
+
+    special_char = "*-'[{]}\|!^&()%$#,.?/><"
+    # Only use 5 letter words
+    for word in english_words_lower_set:
+        if len(word) == 5:
+            for char in special_char:
+                if char in word:
+                    break
+                elif char == special_char[-1]:
+                    five_letter_words.append(word.upper())
+        else:
+            continue
+
+    wordle = WordleSolver(five_letter_words)
+    wordle.solve()
 
