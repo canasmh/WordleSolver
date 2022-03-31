@@ -8,6 +8,8 @@ import time
 
 
 # TODO: KEEP TRACK OF SCORE
+# TODO: QUIT DRIVER IF RUN OUT OF GUESS WORDS
+# TODO: QUIT DRIVER IF COULD NOT GUESS WORD
 
 
 class WordleDriver:
@@ -178,7 +180,6 @@ class WordleSolver(WordleDriver):
                 if letter in word:
                     if letter in self.correct_word:
                         if self.correct_word.index(letter) == word.index(letter):
-                            print(word)
                             continue
                         else:
                             words_to_remove.append(word)
