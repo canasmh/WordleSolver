@@ -7,7 +7,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 import time
 
 
-# TODO: KEEP TRACK OF SCORE
+# TODO: KEEP TRACK OF SCORE (CSV FILE?? date, final_guess, total score (n/5)
 # TODO: QUIT DRIVER IF RUN OUT OF GUESS WORDS
 # TODO: QUIT DRIVER IF COULD NOT GUESS WORD
 
@@ -94,7 +94,6 @@ class WordleSolver(WordleDriver):
 
         else:
             guess = random.choice(self.five_letter_words)
-
         return guess
 
     def input_guess(self, guess):
