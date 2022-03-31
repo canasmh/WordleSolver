@@ -67,6 +67,20 @@ class WordleSolver(WordleDriver):
         self.guesses = []
         self.irow = 0
 
+    def solver(self):
+        # New guess
+        # Input guess
+        # Check if guess successfully inputted
+        # Remove invalid words
+        pass
+
+    def new_guess(self):
+        if len(self.guesses) == 0:
+            return random.choice(self.common_five_letter_words)
+
+        else:
+            return None
+
     def input_guess(self, guess):
         keyboard = self.get_keyboard()
 
@@ -81,6 +95,7 @@ class WordleSolver(WordleDriver):
 
         if self.word_is_valid():
             self.irow += 1
+            self.guesses.append(guess)
         else:
             self.five_letter_words.remove(guess)
             # TODO: HANDLE CASE WHERE GUESS IS NOT A WORD
