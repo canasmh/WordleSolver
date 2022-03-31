@@ -73,11 +73,12 @@ class WordleSolver(WordleDriver):
         self.i_row = 0
 
     def solve(self):
+        guess = "_____"
 
-        while self.i_row < len(self.game_rows):
+        while self.i_row < len(self.game_rows) and guess is not None:
             print(f"Guess # {self.i_row + 1}")
-            print(f"Length of five letter words: {len(self.five_letter_words)}")
-            print(f"Correct word: {''.join(self.correct_word)}")
+            print(f"Length of valid five letter words: {len(self.five_letter_words)}")
+            print(f"Valid words: {', '.join(self.five_letter_words)}")
             guess = self.new_guess()
             print(f"Guess word: {guess}")
             self.input_guess(guess)
@@ -87,13 +88,20 @@ class WordleSolver(WordleDriver):
                 print(f"You won!\nCorrect word: {''.join(self.correct_word)}")
                 self.driver.quit()
                 break
+        self.driver.quit()
 
     def new_guess(self):
         if len(self.guesses) == 0:
             guess = random.choice(self.common_five_letter_words)
 
         else:
-            guess = random.choice(self.five_letter_words)
+            try:
+                guess = random.choice(self.five_letter_words)
+            except IndexError:
+                print(f"Looks like you've run out guesses. \nLast guessed word: {self.guesses[-1]}")
+                print(f"Correct word structure: {''.join(self.correct_word)}")
+                guess = None
+
         return guess
 
     def input_guess(self, guess):
@@ -114,6 +122,7 @@ class WordleSolver(WordleDriver):
             self.i_row = self.i_row + 1
             self.guesses.append(guess)
             self.evaluate_guess()
+            self.five_letter_words.remove(guess)
             self.remove_invalid_words()
 
         else:
@@ -124,6 +133,7 @@ class WordleSolver(WordleDriver):
                 if key.text == "":
                     for _ in list(range(5)):
                         key.click()
+                        time.sleep(0.2)
                     break
 
     def word_is_valid(self):
@@ -156,6 +166,8 @@ class WordleSolver(WordleDriver):
 
             elif evaluation == "correct":
                 self.correct_word[index] = letter
+
+        print(f"Correct word: {''.join(self.correct_word)}")
 
     def find_invalid_words(self):
         words_to_remove = []
@@ -203,10 +215,6 @@ class WordleSolver(WordleDriver):
             if word in words_to_remove:
                 continue
 
-        # Remove words you've already guessed
-        for guess in self.guesses:
-            words_to_remove += guess
-
         return words_to_remove
 
     def remove_invalid_words(self):
@@ -218,7 +226,6 @@ class WordleSolver(WordleDriver):
                 self.five_letter_words.remove(word)
             except ValueError:
                 continue
-        print(f"valid Words: {', '.join(self.five_letter_words)}")
 
 
 if __name__ == "__main__":
