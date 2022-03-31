@@ -13,7 +13,8 @@ class WordleDriver:
         self.url = 'https://www.nytimes.com/games/wordle/index.html'
         self.driver.get(self.url)
         self.game_app = self.expand_shadow_element(self.driver.find_element(By.TAG_NAME, "game-app"))
-        time.sleep(3)
+        self.game_rows = self.game_app.find_elements(By.TAG_NAME, "game-row")
+        time.sleep(2)
         self.close_instructions()
 
     def close_instructions(self):
@@ -31,6 +32,14 @@ class WordleDriver:
         letters = keyboard_shadow.find_elements(By.TAG_NAME, 'button')
 
         return letters
+
+    def get_tiles(self, game_row):
+        game_row_shadow = self.expand_shadow_element(game_row)
+        tile_elements = game_row_shadow.find_elements(By.TAG_NAME, "game-tile")
+        tiles = []
+
+        for tile in tile_elements:
+            tiles.append(self.expand_shadow_element(tile))
 
 
 if __name__ == "__main__":
