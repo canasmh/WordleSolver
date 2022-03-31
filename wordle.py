@@ -1,3 +1,5 @@
+import random
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
@@ -42,6 +44,27 @@ class WordleDriver:
             tiles.append(self.expand_shadow_element(tile))
 
         return tiles
+
+
+class WordleSolver(WordleDriver):
+
+    def __init__(self, five_letter_words):
+        super().__init__()
+        self.common_five_letter_words = [
+            'FRAME',
+            'GRAZE',
+            'WINDY',
+            'PAINT',
+            'GOURD',
+            'SWING',
+            'AUDIO',
+            'ARISE'
+        ]
+        self.five_letter_words = five_letter_words
+        self.correct_word = "_____"
+        self.letters_not_present = []
+        self.letters_present = {}
+        self.guesses = []
 
 
 if __name__ == "__main__":
