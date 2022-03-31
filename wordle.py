@@ -41,6 +41,8 @@ class WordleDriver:
         for tile in tile_elements:
             tiles.append(self.expand_shadow_element(tile))
 
+        return tiles
+
 
 if __name__ == "__main__":
     wordle = WordleDriver()
