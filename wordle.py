@@ -8,6 +8,7 @@ import time
 
 
 # TODO: KEEP TRACK OF SCORE (CSV FILE?? date, final_guess, total score (n/5)
+# TODO: WHEN EVALUATING LETTERS, SEE IF ITS ALREADY IN A CATEGORY.. WILL HELP WITH GUESSING.
 # TODO: QUIT DRIVER IF RUN OUT OF GUESS WORDS
 # TODO: QUIT DRIVER IF COULD NOT GUESS WORD
 
@@ -247,6 +248,7 @@ if __name__ == "__main__":
         else:
             continue
     five_letter_word.append("LOWLY")
+    five_letter_word.append("FEWER")
 
     wordle = WordleSolver(five_letter_word)
     wordle.solve()
