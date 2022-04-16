@@ -17,7 +17,9 @@ class WordleDriver:
 
     def __init__(self):
         self.service = Service(ChromeDriverManager().install())
-        self.driver = webdriver.Chrome(service=self.service)
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument("--headless")
+        self.driver = webdriver.Chrome(service=self.service, options=chrome_options)
         self.url = 'https://www.nytimes.com/games/wordle/index.html'
         self.driver.get(self.url)
         self.game_app = self.expand_shadow_element(self.driver.find_element(By.TAG_NAME, "game-app"))
