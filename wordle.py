@@ -81,6 +81,8 @@ class WordleSolver(WordleDriver):
         while self.i_row < len(self.game_rows) and guess is not None:
             print(f"Guess # {self.i_row + 1}")
             print(f"Length of valid five letter words: {len(self.five_letter_words)}")
+            print(f"Letters absent: {', '.join(self.letters_absent)}")
+            print(f"Letters present: {', '.join(self.letters_present.keys())}")
             print(f"Valid words: {', '.join(self.five_letter_words)}")
             guess = self.new_guess()
             print(f"Guess word: {guess}")
